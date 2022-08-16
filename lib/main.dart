@@ -1,12 +1,44 @@
+import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:health_app/screens/bottomNavBar.dart';
+import 'package:health_app/screens/heart.dart';
+import 'package:health_app/screens/heartRate.dart';
 import 'package:health_app/screens/home.dart';
 import 'package:health_app/screens/login.dart';
+import 'package:health_app/screens/recordVideo.dart';
+
+List<CameraDescription> cameras = [];
+
+// Future<void> main() async {
+//   // Fetch the available cameras before initializing the app.
+//   try {
+//     WidgetsFlutterBinding.ensureInitialized();
+//     cameras = await availableCameras();
+//   } on CameraException catch (e) {
+//     print('Error in fetching the cameras: $e');
+//   }
+//   runApp(MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Flutter Demo',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       debugShowCheckedModeBanner: false,
+//       home: CameraScreen(),
+//     );
+//   }
+// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  cameras = await availableCameras();
   runApp(const MyApp());
 }
 
@@ -31,7 +63,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      home: Heart(),
       // home: MyHomePage(
       //   title: "",
       // ),

@@ -11,7 +11,7 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int selectedPage = 0;
+  int selectedPage = 2;
   final _childrens = [
     HomePage(),
     Container(
@@ -42,9 +42,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
             style: TabStyle.reactCircle,
             backgroundColor: Colors.white,
             items: [
-              TabItem(title: 'Explore', icon: Icons.home),
+              TabItem(title: 'Consult', icon: Icons.home),
               TabItem(title: 'Search', icon: Icons.content_paste_outlined),
-              TabItem(title: 'Consult', icon: Icons.health_and_safety),
+              TabItem(title: 'Explore', icon: Icons.health_and_safety),
               TabItem(title: 'Free tolols', icon: Icons.history),
               TabItem(title: 'Files', icon: Icons.file_copy_sharp),
               // TabItem(icon: Icons.person),

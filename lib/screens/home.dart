@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_app/screens/heartRate.dart';
+import 'package:health_app/screens/recordVideo.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -224,43 +225,53 @@ class _HomePageState extends State<HomePage> {
                   width: 30,
                 ),
                 Expanded(
-                  child: Container(
-                    height: 130,
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple[50],
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RecordVideo()));
+                      });
+                    },
+                    child: Container(
+                      height: 130,
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple[50],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(60),
+                        ),
+                        // border: Border.all(color: Colors.grey, width: 1),
                       ),
-                      // border: Border.all(color: Colors.grey, width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.only(left: 25),
-                            child: Text(
-                              "Blood Oxygen spO2 Tracker",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text(
+                                "Blood Oxygen spO2 Tracker",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.white,
-                              size: 15,
+                          Expanded(
+                            child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.white,
+                                size: 15,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
