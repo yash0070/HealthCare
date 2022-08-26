@@ -1,18 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:health_app/screens/bottomNavBar.dart';
-import 'package:health_app/screens/home.dart';
-import 'package:health_app/screens/register.dart';
+import 'package:health_app/authDr.dart/registerAuth.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../screens/bottomNavBar.dart';
+
+class DoctorLogin extends StatefulWidget {
+  const DoctorLogin({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<DoctorLogin> createState() => _DoctorLoginState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _DoctorLoginState extends State<DoctorLogin> {
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController _email = TextEditingController();
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 SizedBox(height: size.height * 0.1),
                 const Text(
-                  "LogIn",
+                  "Doctor",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: size.height * 0.04),
@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RegisterPage(),
+                                builder: (context) => DoctorRegister(),
                               ),
                             );
                           });

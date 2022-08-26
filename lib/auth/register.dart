@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:health_app/screens/bottomNavBar.dart';
-import 'package:health_app/screens/home.dart';
-import 'package:health_app/screens/login.dart';
+
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

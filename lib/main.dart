@@ -1,12 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:health_app/pages/welcome.dart';
 import 'package:health_app/screens/bottomNavBar.dart';
-import 'package:health_app/screens/heart.dart';
-import 'package:health_app/screens/heartRate.dart';
+
 import 'package:health_app/screens/home.dart';
-import 'package:health_app/screens/login.dart';
-import 'package:health_app/screens/recordVideo.dart';
+
+import 'package:health_app/vitals/heart_rate.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -38,6 +39,14 @@ List<CameraDescription> cameras = [];
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   cameras = await availableCameras();
   runApp(const MyApp());
 }
@@ -63,7 +72,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: Heart(),
+      home: Welcome(),
       // home: MyHomePage(
       //   title: "",
       // ),

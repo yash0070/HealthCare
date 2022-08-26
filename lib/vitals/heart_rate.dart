@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:health_app/auth/login.dart';
 import 'package:health_app/screens/chart.dart';
+import 'package:health_app/vitals/heart_rate_result.dart';
 import 'package:wakelock/wakelock.dart';
 
 class Heart extends StatefulWidget {
@@ -14,31 +17,24 @@ class Heart extends StatefulWidget {
 }
 
 class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
-  bool _toggled = false; // toggle button value
-  List<SensorValue> _data = <SensorValue>[]; // array to store the values
+  bool _toggled = false;
+
+  List<SensorValue> _data = <SensorValue>[];
+
   CameraController? _controller;
-  double _alpha = 0.3; // factor for the mean value
-  AnimationController? _animationController;
-  double _iconScale = 1;
-  int _bpm = 0; // beats per minute
-  int _fs = 30; // sampling frequency (fps)
-  int _windowLen = 30 * 6; // window length to display - 6 seconds
-  CameraImage? _image; // store the last camera image
-  double? _avg; // store the average value during calculation
-  DateTime? _now; // store the now Datetime
-  Timer? _timer; // timer for image processing
+
+  int _bpm = 0;
+
+  int _fs = 30;
+  int _windowLen = 30 * 6;
+  CameraImage? _image;
+  double? _avg;
+  DateTime? _now;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(duration: Duration(milliseconds: 500), vsync: this);
-    _animationController!
-      ..addListener(() {
-        setState(() {
-          _iconScale = 1.0 + _animationController!.value * 0.4;
-        });
-      });
   }
 
   @override
@@ -46,9 +42,7 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
     _timer?.cancel();
     _toggled = false;
     _disposeController();
-    Wakelock.disable();
-    _animationController?.stop();
-    _animationController?.dispose();
+
     super.dispose();
   }
 
@@ -102,64 +96,55 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Transform.scale(
-                    scale: _iconScale,
-                    child: IconButton(
-                      icon: Icon(
-                          _toggled ? Icons.favorite : Icons.favorite_border),
-                      color: Colors.red,
-                      iconSize: 128,
-                      onPressed: () {
-                        if (_toggled) {
-                          _untoggle();
-                        } else {
-                          _toggle();
-                        }
-                      },
-                    ),
+                  child: IconButton(
+                    icon:
+                        Icon(_toggled ? Icons.favorite : Icons.favorite_border),
+                    color: Colors.red,
+                    iconSize: 128,
+                    onPressed: () {
+                      _toggle();
+                      // if (_toggled) {
+                      //   _untoggle();
+                      // } else {
+                      //   _toggle();
+                      // }
+                    },
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Center(
-                      child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Estimated BPM",
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                      Text(
-                        (_bpm > 30 && _bpm < 150 ? _bpm.toString() : "--"),
-                        style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  )),
-                ),
+                // Expanded(
+                //   flex: 1,
+                //   child: Center(
+                //       child: Column(
+                //     mainAxisSize: MainAxisSize.min,
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     children: <Widget>[
+                //       Text(
+                //         "Estimated BPM",
+                //         style: TextStyle(fontSize: 18, color: Colors.grey),
+                //       ),
+                //       Text(
+                //         (_bpm > 30 && _bpm < 150 ? _bpm.toString() : "--"),
+                //         style: TextStyle(
+                //             fontSize: 32, fontWeight: FontWeight.bold),
+                //       ),
+                //     ],
+                //   )),
+                // ),
               ],
             ),
-            // Expanded(
-            //   flex: 1,
-            //   child: Container(
-            //     margin: EdgeInsets.all(12),
-            //     decoration: BoxDecoration(
-            //         borderRadius: BorderRadius.all(
-            //           Radius.circular(18),
-            //         ),
-            //         color: Colors.black),
-            //     child: Chart(_data),
-            //   ),
-            // ),
           ],
         ),
       ),
     );
   }
 
+  void onPause() {
+    _controller!.dispose();
+    // _controller!.stopImageStream();
+    _updateBPM();
+  }
+
   void _clearData() {
-    // create array of 128 ~= 255/2
     _data.clear();
     int now = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < _windowLen; i++)
@@ -169,16 +154,38 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
               DateTime.fromMillisecondsSinceEpoch(now - i * 1000 ~/ _fs), 128));
   }
 
+  Future<void> timer() async {
+    try {
+      await Future.delayed(Duration(seconds: 30), () {
+        _controller!.setFlashMode(FlashMode.off);
+        log('function called.........!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ResultPage(
+                      BpmResult: _bpm,
+                    )));
+      });
+    } catch (e) {}
+  }
+
+  void afterTime() async {
+    _controller!.dispose();
+    _disposeController();
+  }
+
   void _toggle() {
     _clearData();
+
     _initController().then((onValue) {
+      timer();
       Wakelock.enable();
       startVideoRecording();
-      _animationController?.repeat(reverse: true);
+
       setState(() {
         _toggled = true;
       });
-      // after is toggled
+
       _initTimer();
       _updateBPM();
     });
@@ -187,9 +194,7 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
   void _untoggle() {
     _clearData();
     _disposeController();
-    Wakelock.disable();
-    _animationController?.stop();
-    _animationController?.value = 0.0;
+
     setState(() {
       _toggled = false;
     });
@@ -216,8 +221,6 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
     }
   }
 
-  ///////
-
   void onVideoRecordButtonPressed() {
     startVideoRecording().then((_) {
       if (mounted) {
@@ -230,20 +233,17 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
     final CameraController? cameraController = _controller;
 
     if (cameraController == null || !cameraController.value.isInitialized) {
-      // showInSnackBar('Error: select a camera first.');
       Fluttertoast.showToast(msg: 'Error: select a camera first.');
       return;
     }
 
     if (cameraController.value.isRecordingVideo) {
-      // A recording is already started, do nothing.
       return;
     }
 
     try {
       await cameraController.startVideoRecording();
     } on CameraException catch (e) {
-      // _showCameraException(e);
       return;
     }
   }
@@ -274,12 +274,6 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
   }
 
   void _updateBPM() async {
-    // Bear in mind that the method used to calculate the BPM is very rudimentar
-    // feel free to improve it :)
-
-    // Since this function doesn't need to be so "exact" regarding the time it executes,
-    // I only used the a Future.delay to repeat it from time to time.
-    // Ofc you can also use a Timer object to time the callback of this function
     List<SensorValue> _values;
     double _avg;
     int _n;
@@ -289,7 +283,7 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
     int _counter;
     int _previous;
     while (_toggled) {
-      _values = List.from(_data); // create a copy of the current data array
+      _values = List.from(_data);
       _avg = 0;
       _n = _values.length;
       _m = 0;
@@ -314,6 +308,7 @@ class _HeartState extends State<Heart> with SingleTickerProviderStateMixin {
         }
       }
       if (_counter > 0) {
+        double _alpha = 0.3;
         _bpm = _bpm / _counter;
         print(_bpm);
         setState(() {

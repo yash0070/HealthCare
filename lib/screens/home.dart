@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:health_app/screens/heartRate.dart';
-import 'package:health_app/screens/recordVideo.dart';
+
+import 'package:url_launcher/url_launcher.dart';
+
+import '../vitals/heart_rate.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,16 +12,60 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+  final Uri _url = Uri.parse("https://prabhakar0821.github.io/stress/");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
+      drawer: Drawer(
+        child: ListView(
+          children: const [
+            DrawerHeader(
+              child: Center(
+                  child: Text(
+                "Health Care",
+                style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.orange),
+              )),
+            ),
+            ListTile(
+              title: Text(
+                "Profile",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              ),
+            ),
+            ListTile(
+              title: Text(
+                "ContactUs",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              ),
+            ),
+            ListTile(
+              title: Text(
+                "About",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              ),
+            ),
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        leading: const Icon(
-          Icons.menu,
-          color: Colors.black,
+        leading: IconButton(
+          onPressed: () {
+            scaffoldKey.currentState!.openDrawer();
+          },
+          icon: Icon(
+            Icons.menu,
+            color: Colors.black,
+          ),
         ),
         actions: const [
           Icon(
@@ -31,7 +77,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Container(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -156,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Text(
-                    "Check Your Stress Level",
+                    "Check Your Blood Pressure",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                   ),
                 ],
@@ -174,10 +220,8 @@ class _HomePageState extends State<HomePage> {
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HeartRate()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Heart()));
                       });
                     },
                     child: Container(
@@ -228,10 +272,8 @@ class _HomePageState extends State<HomePage> {
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RecordVideo()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Heart()));
                       });
                     },
                     child: Container(
@@ -276,10 +318,48 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ],
-            )
+            ),
+            SizedBox(
+              height: 30,
+            ),
+
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _launchUrl();
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.only(left: 16, right: 16),
+                height: 80,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.deepOrange[50],
+                  borderRadius: BorderRadius.circular(12),
+                  // border:
+                  //     Border.all(color: Colors.grey.withOpacity(0.5), width: 2),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "Check Your Stress Level",
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _launchUrl() async {
+    if (await launchUrl(_url)) {
+      throw 'Could not launch $_url';
+    }
   }
 }

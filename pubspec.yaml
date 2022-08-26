@@ -43,6 +43,7 @@ dependencies:
   video_player: ^2.4.6
   fluttertoast: ^8.0.9
   path_provider: ^2.0.11
+  url_launcher: ^6.1.5
   path: ^1.8.2 
   # flutter_camera: 
 
